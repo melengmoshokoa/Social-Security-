@@ -1,7 +1,7 @@
  import { StatusBar } from 'expo-status-bar';
  import { StyleSheet, Text, View } from 'react-native';
  
- export default function SplashSquare({imageUrl}) {
+ export default function Components({imageUrl}) {
    return (
      <View style={styles.container}>
        <View style={styles.square}>
@@ -15,16 +15,16 @@
  const styles = StyleSheet.create({
    container: {
      backgroundColor: '#fff',
-     alignItems: 'center',
+     paddingHorizontal: 10,
      marginTop: 10,
-     height: '55%',
+     height: '90%',
+     width: '50%',
    },
    square: {
      backgroundColor: "#000000",
-     width: '75%',
-     height: '80%',
+     width: '100%',
+     height: '99%',
      borderRadius: 30,
-     marginTop: 50
    },
    contraction: {
  
