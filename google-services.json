@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "595797492912",
+    "project_id": "social-security-92672",
+    "storage_bucket": "social-security-92672.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:595797492912:android:77224b6478d2a9d8bd6775",
+        "android_client_info": {
+          "package_name": "com.sns.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDEy9sCLXrUcU2FokiLeuVbLMzUxMEvH2U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

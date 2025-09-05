@@ -17,7 +17,7 @@
      backgroundColor: '#fff',
      alignItems: 'center',
      marginTop: 10,
-     height: '50%',
+     height: '55%',
    },
    square: {
      backgroundColor: "#000000",
