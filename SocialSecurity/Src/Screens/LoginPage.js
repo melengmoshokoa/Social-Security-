@@ -1,11 +1,25 @@
 import { StyleSheet,View,Text, TextInput, Button, TouchableOpacity,KeyboardAvoidingView,Platform } from "react-native"; 
 import React, {useState} from "react";
+import { useNavigation } from "@react-navigation/native";
 
 export default function LoginPage(){
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
+
+    const navigation = useNavigation();
+
+    const handleNewUser = () => {
+      navigation.navigate("SignupPage");
+    };
+
+    const LoginUser = () => {
+      navigation.navigate("Main");
+    };
+
+
+
     return(
         <View style={style.container}>
             {/* <KeyboardAvoidingView
@@ -25,7 +39,7 @@ export default function LoginPage(){
             onChangeText={setUsername}
             placeholder="Enter username"
             />
-            <Text>username</Text>
+            
 
             <TextInput
             style={style.passwordInput}
@@ -34,10 +48,22 @@ export default function LoginPage(){
             secureTextEntry={true}
             placeholder="Enter Password"
             />
-            <Text>password</Text>
             
-            <TouchableOpacity style={style.button}>
+
+             <TouchableOpacity
+                            style={style.forgot}
+                            onPress={() => {
+                                navigation.navigate("ForgotPasswordPage");
+                            }}>
+                            <Text style={style.button2}>Forgot password?</Text>
+                        </TouchableOpacity>
+            
+            <TouchableOpacity style={style.button} onPress={LoginUser}>
                 <Text style={style.buttonText}>Log in</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={handleNewUser}>
+                <Text style={style.button2}>Don't have an account? Sign up</Text>
             </TouchableOpacity>
 
             </View>
@@ -99,6 +125,10 @@ const style = StyleSheet.create({
     fontWeight: 'bold',
     paddingTop: '5%',
 
+ },
+ button2: {
+   marginTop: 18,
+   color: '#828282'
  }
 
 

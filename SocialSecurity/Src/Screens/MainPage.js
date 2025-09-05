@@ -1,9 +1,16 @@
-import { StyleSheet,View,Text } from "react-native";
+import { StyleSheet,View,Text, Image } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import Components from "../Components/Components"
 import BottomNav from "../Components/BottomNav";
-
+import image1 from "../Images/200.gif"
+import image2 from "../Images/222.gif"
+import image3 from "../Images/123.gif"
+import image4 from "../Images/333.gif"
+import image5 from "../Images/444.gif"
+import image6 from "../Images/111.gif"
 
 export default function MainPage(){
+
     return (
     <View style={style.container}>
 
@@ -16,7 +23,7 @@ export default function MainPage(){
         </View>
 
         <View style={style.square}>
-            <Text>Hi EVERYONNNNNNNNNN</Text>
+            
         </View>
 
         </View>
@@ -25,23 +32,16 @@ export default function MainPage(){
         <View style={style.box}>
 
         <Components
-                    // imageUrl={ imageUrl}
+                    imageUrl={image1}
+                    pageName="Incident Center"
+                    navName="IncidentCenter"
+                    
         />
 
         <Components
-                    // imageUrl={ imageUrl}
-        />
-
-        </View>
-
-        <View style={style.box}>
-
-        <Components
-                    // imageUrl={ imageUrl}
-        />
-
-        <Components
-                    // imageUrl={ imageUrl}
+                    imageUrl={image2}
+                    pageName="Log Analysis"
+                    navName="Logs"
         />
 
         </View>
@@ -49,11 +49,31 @@ export default function MainPage(){
         <View style={style.box}>
 
         <Components
-                    // imageUrl={ imageUrl}
+                    imageUrl={image3}
+                    pageName="Identity Scanner"
+                    navName="IdentityScanner"
         />
 
         <Components
-                    // imageUrl={ imageUrl}
+                    imageUrl={image4}
+                    pageName="Breach Alerts"
+                    navName="Breachs"
+        />
+
+        </View>
+
+        <View style={style.box}>
+
+        <Components
+                    imageUrl={image5}
+                    pageName="Image Guard"
+                    navName="Images"
+        />
+
+        <Components
+                    imageUrl={image6}
+                    pageName="Password Saftey"
+                    navName="Passwords"
         />
 
         </View>
@@ -80,11 +100,13 @@ const style = StyleSheet.create({
    square: {
      paddingTop: 80,
      backgroundColor: "#000000",
-     width: '21%',
-     height: '20%',
-     borderRadius: '50%',
+     width: 80,
+     height: 70,
+     borderRadius: 60,
      marginTop: 55,
      marginLeft: 35,
+     borderWidth: 1,
+     borderColor: '#828282'
      
    },
    message: {
@@ -96,12 +118,12 @@ const style = StyleSheet.create({
     paddingTop: 65,
     paddingHorizontal: 15,
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: 20,
    },
    box: {
     flexDirection: 'row',
     height: '23%',
-   }
+   },
  
  
  });
