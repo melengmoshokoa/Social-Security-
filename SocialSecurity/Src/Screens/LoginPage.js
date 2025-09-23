@@ -1,6 +1,9 @@
 import { StyleSheet,View,Text, TextInput, Button, TouchableOpacity,KeyboardAvoidingView,Platform } from "react-native"; 
 import React, {useState} from "react";
 import { useNavigation } from "@react-navigation/native";
+import { signInWithEmailAndPassword } from "firebase/auth"
+import { auth } from "../../firebase"
+
 
 export default function LoginPage(){
 
@@ -9,24 +12,47 @@ export default function LoginPage(){
     const [username, setUsername] = useState('');
 
     const navigation = useNavigation();
+    
 
     const handleNewUser = () => {
       navigation.navigate("SignupPage");
     };
 
-    const LoginUser = () => {
-      navigation.navigate("Main");
-    };
+    const LoginUser = async () => {
+  try {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+    const idToken = await userCredential.user.getIdToken();
+
+    const response = await fetch("http://10.0.0.120:5000/verify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token: idToken }),
+    });
+
+
+    console.log(response);
+    if (!response.ok){
+      throw {status: response.status, message: response.text()};
+    }
+
+    const userInfo = {
+        username : username,
+        email : email
+    }
+
+    navigation.navigate("Main", {userInfo});
+  } catch (error) {
+    console.log("Login failed:", error.message);
+  }
+};
+
 
 
 
     return(
         <View style={style.container}>
-            {/* <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={style.container}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}></KeyboardAvoidingView> */}
-
+            
             <Text style={style.Logo}>SocialSecurity</Text>
 
             <View style={style.login}>
@@ -38,6 +64,13 @@ export default function LoginPage(){
             value = {username}
             onChangeText={setUsername}
             placeholder="Enter username"
+            />
+
+            <TextInput
+            style={style.usernameInput}
+            value = {email}
+            onChangeText={setEmail}
+            placeholder="Enter email"
             />
             
 

@@ -1,5 +1,5 @@
 import { StyleSheet,View,Text, Image } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Components from "../Components/Components"
 import BottomNav from "../Components/BottomNav";
 import image1 from "../Images/200.gif"
@@ -11,13 +11,16 @@ import image6 from "../Images/111.gif"
 
 export default function MainPage(){
 
+    const route = useRoute();
+    const { userInfo } = route.params;
+
     return (
     <View style={style.container}>
 
 
         <View style={style.userinfo2}>
         <View style={style.userinfo}>
-        <Text style={style.greeting}>GOOD MORNING ITUMELENG</Text>
+        <Text style={style.greeting}>GOOD MORNING {userInfo.username}</Text>
         <Text style={style.message}>hope you're havinga a good day</Text>
         
         </View>

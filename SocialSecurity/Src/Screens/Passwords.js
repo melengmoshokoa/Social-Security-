@@ -1,20 +1,17 @@
-import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  SafeAreaView,
-  TextInput,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
+import React, { useState, useRoute } from 'react';
+import zxcvbn from 'zxcvbn';
+import { View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput, TouchableOpacity, Image} from 'react-native';
 import BottomNav from "../Components/BottomNav";
+import { AnimatedCircularProgress } from 'react-native-circular-progress';
 
 export default function Passwords() {
   const [password, setPassword] = useState('');
   const [strength, setStrength] = useState(null);
   const [feedback, setFeedback] = useState({ bold: '', regular: '' });
+  const [results, setResults] = useState('');
+
+  // const route = useRoute();
+  // const { userInfo } = route.params;
 
   const evaluatePassword = (pwd) => {
     let score = 0;
@@ -23,16 +20,23 @@ export default function Passwords() {
     if (/[0-9]/.test(pwd)) score += 1;
     if (/[^A-Za-z0-9]/.test(pwd)) score += 1;
 
-    const percentage = (score / 4) * 100;
+    const result = zxcvbn(pwd);
+    setResults(result);
+    console.log(result.score);
+    console.log(result.feedback.suggestions);
+
+    const weightedScore = (score * 0.4) + (result.score * 0.6);
+
+    const percentage = (weightedScore / 4) * 100;
     let bold = '';
     let regular = '';
 
-    if (percentage === 100) {
+    if (percentage >= 90) {
       bold = 'Excellent! ';
       regular = 'Your password is very strong.';
-    } else if (percentage >= 75) {
+    } else if (percentage >= 70) {
       bold = 'Good Job! ';
-      regular = 'Your password is strong, but could be better.';
+      regular = 'Still room for improvement, add more randomness.';
     } else if (percentage >= 50) {
       bold = 'Fair. ';
       regular = 'Consider adding symbols or numbers.';
@@ -49,6 +53,13 @@ export default function Passwords() {
     setStrength(result.percentage);
     setFeedback({ bold: result.bold, regular: result.regular });
   };
+
+  const getColor = () => {
+      if (strength >= 90) return "#4CAF50"; // green
+      if (strength >= 70) return "#2196F3"; // blue
+      if (strength >= 50) return "#FFC107"; // amber
+      return "#F44336"; // red
+    };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -69,16 +80,33 @@ export default function Passwords() {
           </TouchableOpacity>
 
           {strength !== null && (
-            <>
-              <View style={styles.resultContainer}>
-                <Text style={styles.percentageText}>{strength.toFixed(0)}%</Text>
-              </View>
-              <Text style={styles.feedbackText}>
-                <Text style={styles.boldText}>{feedback.bold}</Text>
-                {feedback.regular}
-              </Text>
-            </>
-          )}
+              <>
+                <View style={{ alignItems: 'center', marginVertical: 20, paddingTop: 20 }}>
+                  <AnimatedCircularProgress
+                    size={220}
+                    width={5}
+                    fill={strength}  
+                    tintColor={getColor()} 
+                    backgroundColor="#ffffffff"
+                  >
+                    {() => (
+                      <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
+                        {strength.toFixed(0)}%
+                      </Text>
+                    )}
+                  </AnimatedCircularProgress>
+                </View>
+
+                <Text style={styles.feedbackText}>
+                  <Text style={styles.boldText}>{feedback.bold}</Text>
+                  {feedback.regular}
+                </Text>
+                <Text style={styles.feedbackText}>
+                  {results.feedback.suggestions}
+                </Text>
+              </>
+            )}
+
         </ScrollView>
 
         <BottomNav />

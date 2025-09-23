@@ -1,6 +1,10 @@
 import { StyleSheet,View,Text, TextInput, Button, TouchableOpacity,KeyboardAvoidingView,Platform } from "react-native"; 
 import React, {useState} from "react";
 import { useNavigation } from "@react-navigation/native";
+import { createUserWithEmailAndPassword, updateProfile} from "firebase/auth"
+import {auth} from "../../firebase"
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../../firebase";
 
 export default function SignupPage(){
 
@@ -14,77 +18,43 @@ export default function SignupPage(){
     const handleExistingUser = () => {
         navigation.navigate("Login"); 
     };
-    
 
     const handleSignup = async () => {
 
-         navigation.navigate("Main");
+ try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-        if (!email || !password || !username) {
-            setError("All fields are required");
-            return;
-        }
-        if (!validatePassword(password)) {
-            setError("Password must be at least 8 characters long and include an uppercase letter, a lowercase letter, a number, and a special character.");
-            return;
-        }
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            setError("Invalid email address format");
-            return;
-        }
-        if (password !== confirmPassword) {
-            setError("Passwords do not match");
-            return;
-        }
+    const idToken = await userCredential.user.getIdToken();
+    await updateProfile(userCredential.user, { displayName: username });
 
-        if (username.length < 3) {
-            setError("Username must be at least 3 characters long");
-            return;
-        }
-        console.log("This is the username ", username);
-      //   try {
-      //       //  await signUp(email, password, username);
-      //       const data = await registerUser(email, password, username);
-      //       console.log("Email verification sent to " + email + ". Please verfiy your email to proceed");
+    // const response = await fetch("http://10.0.0.120:8081/verify", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ token: idToken }),
+    // });
 
-      //       console.log("User Registering???");
-      //       await SecureStore.setItemAsync("userToken", data.data.token);
-      //       setError("");
-      //       console.log("User signed up successfully");
-      //       //navigate to the home page with the users info
-      //       const userInfo = {
-      //           userId: data.data.uid,
-      //           username: data.data.username,
-      //           //???     token : data.data.token
-      //       };
-      //       // navigation.navigate("LoginPage", { userInfo });
-      //       Alert.alert("Verify Your Email", "A verification email has been sent to your email address. Please verify your email to proceed.", [{ text: "OK", onPress: () => navigation.navigate("LoginPage", { userInfo }) }]);
-      //   } catch (error) {
-      //       let errorMessage = "Error signing up";
-      //       if (error.code === "auth/email-already-in-use") {
-      //           errorMessage = "Email address is already in use";
-      //       } else if (error.code === "auth/invalid-email") {
-      //           errorMessage = "Invalid email address format";
-      //       } else if (error.code === "auth/weak-password") {
-      //           errorMessage = "Password should be at least 6 characters long";
-      //       } else {
-      //           console.error("Error signing up:", error);
-      //           errorMessage = error.message; // Default to Firebase's error message
-      //       }
-      //       // console.error("Error signing up:", error);
-      //       setError(errorMessage);
-      //   }
-    };
+    // console.log("*********");
+    // console.log(response.text());
+    // if (!response.ok) {
+    //     throw new Error("This email is already being used");
+    // }
+
+    const userInfo = {
+        username : username,
+        email : email
+    }
+
+    navigation.navigate("Main", { userInfo });
+  } catch (error) {
+    setError(error.message);
+  }
+};
+    
 
 
     return(
         <View style={style.container}>
-            {/* <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={style.container}
-            keyboardVerticalOffset={Platform.OS === 'ios' ? 10 : 0}></KeyboardAvoidingView> */}
-
+            
             <Text style={style.Logo}>SocialSecurity</Text>
 
             <View style={style.login}>

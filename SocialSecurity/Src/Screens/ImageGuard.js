@@ -1,178 +1,112 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput, TouchableOpacity, Image} from 'react-native';
-import BottomNav from "../Components/BottomNav";
-import * as DocumentPicker from 'expo-document-picker';
-import * as ImagePicker from 'expo-image-picker';
-
+import React, { useState } from "react";
+import { View, Text, TouchableOpacity, Image, ScrollView, StyleSheet, Linking } from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import axios from "axios";
 
 export default function ImageGuard() {
-  const [attachment, setAttachment] = useState(null);
+  const [image, setImage] = useState(null);
+  const [results, setResults] = useState([]);
 
-    const pickFile = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  // Pick image from gallery
+  const pickImage = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      alert("Permission to access gallery is required!");
+      return;
+    }
 
-    if (permissionResult.granted === false) {
-    alert("Permission to access gallery is required!");
-    return;
-  }
-
-  const result = await ImagePicker.launchImageLibraryAsync({
-    mediaTypes: ImagePicker.MediaTypeOptions.Images,
-    quality: 1,
-  });
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 1,
+    });
 
     if (!result.canceled) {
-     const newfile = result.assets[0];
-    setAttachment(newfile); 
-  }
-
+      setImage(result.assets[0]);
+      setResults([]); // reset previous results
+    }
   };
 
-  const removeFile = () => {
-    setAttachment(null);
+  // Upload image to backend
+  const handleSubmit = async () => {
+    if (!image) return;
+
+    const formData = new FormData();
+    formData.append("file", {
+      uri: image.uri,
+      name: image.fileName || "photo.jpg",
+      type: "image/jpeg",
+    });
+
+    try {
+      const response = await axios.post("http://10.0.0.120:8081/reverse-image", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      // Parse results
+      if (response.data.results && response.data.results.length > 0) {
+        setResults(response.data.results); // items contains image search results
+      } else {
+        alert("No results found");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error uploading image");
+    }
   };
 
-  const handleSubmit = () => {
-  };
-
-  
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        <Text style={styles.title}>AI Image Reverse Engineering</Text>
+    <View style={styles.container}>
+      <Text style={styles.title}>AI Image Reverse Search</Text>
 
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+      <TouchableOpacity style={styles.button} onPress={pickImage}>
+        <Text style={styles.buttonText}>{image ? "Change Image" : "Pick an Image"}</Text>
+      </TouchableOpacity>
 
+      {image && (
+        <Image source={{ uri: image.uri }} style={styles.preview} resizeMode="contain" />
+      )}
 
-          <View style={styles.uploadSection}>
-            
+      {image && (
+        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+          <Text style={styles.buttonText}>Search</Text>
+        </TouchableOpacity>
+      )}
 
-            {attachment && (
-              <View style={styles.imagePreviewBlock}>
-                
-                  <View style={styles.filePreview}>
-                        <Image
-                        source={{ uri: attachment.uri }}
-                        style={styles.imagePreview}
-                        resizeMode="contain"
-                        />
-                    <TouchableOpacity onPress={() => removeFile()}>
-                      <Text style={styles.removeText}>Remove</Text>
-                    </TouchableOpacity>
-                  </View>
-        
-              </View>
-            )}
-          </View>
-
-          <TouchableOpacity style={styles.uploadButton} onPress={pickFile}>
-              <Text style={styles.uploadButtonText}>
-                {attachment ? "Change Image" : "Attach Image"}
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.button}>
-                            <Text style={styles.buttonText}>Submit</Text>
-                        </TouchableOpacity>
-
-        </ScrollView>
-       <BottomNav />
-      </View>
-
-       
-    </SafeAreaView>
-    
+      <ScrollView style={{ marginTop: 20 }}>
+        {results.map((item, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.resultItem}
+            onPress={() => Linking.openURL(item.link)}
+          >
+            <Image
+              source={{ uri: item.image.thumbnailLink }}
+              style={styles.thumbnail}
+              resizeMode="cover"
+            />
+            <Text style={styles.resultTitle}>{item.title}</Text>
+            <Text style={styles.resultLink}>{item.link}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#fff',
-    justifyItems: 'center'
-  },
-  container: {
-    flex: 1,
-    paddingHorizontal: 20,
-    backgroundColor: '#fff',
-    justifyItems: 'center'
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: '600',
-    marginTop: 20,
-    marginBottom: 10,
-  },
-  scrollContent: {
-    // paddingBottom: 50,  
-  },
-  button:{
-    marginTop: 20,
-    borderWidth: 1,
-    borderRadius: 30,
-    backgroundColor: '#000',
-    width: '95%',
-    height: '50',
-
- },
- buttonText: {
-    color: '#fff',
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: 'bold',
-    paddingTop: '5%',
-
- },
- uploadSection: {
-    marginTop: 20, alignItems: 'flex-start'
-  },
-  uploadButton: {
-    backgroundColor: '#007AFF', padding: 10,
-    borderRadius: 30,
-    width: '95%',
-    height: '50',
-  },
-  uploadButtonText: {
-    color: '#FFF', 
-    fontSize: 16,
-    textAlign: 'center',
-    paddingTop: '2%',
-  },
-  filePreview: {
-    marginTop: 10, flexDirection: 'row',
-    alignItems: 'center'
-  },
-  fileName: {
-    fontSize: 13},
-    removeText: { color: 'red',
-    marginLeft: 10 },
+  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
+  title: { fontSize: 28, fontWeight: "600", marginBottom: 20 },
   button: {
-    marginTop: 20,
-    borderWidth: 1,
+    backgroundColor: "#007AFF",
+    padding: 12,
     borderRadius: 30,
-    backgroundColor: '#000', 
-    width: '95%', 
-    height: 50,
-    justifyContent: 'center'
+    alignItems: "center",
+    marginVertical: 10,
   },
-  buttonText: {
-    color: '#fff', 
-    textAlign: 'center',
-    fontSize: 18, 
-    fontWeight: 'bold'
-  },
-  imagePreview: {
-  width: '100%',
-  height: 500,
-  borderRadius: 10,
-  marginBottom: 10,
-},
-imagePreviewBlock: {
-  marginTop: 10,
-  alignItems: 'center',
-  justifyContent: 'center',
-  
-},
-
-
+  buttonText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  preview: { width: "100%", height: 300, marginTop: 10, borderRadius: 10 },
+  resultItem: { marginBottom: 20 },
+  thumbnail: { width: "100%", height: 200, borderRadius: 10 },
+  resultTitle: { fontWeight: "bold", marginTop: 5 },
+  resultLink: { color: "#007AFF", fontSize: 12 },
 });
