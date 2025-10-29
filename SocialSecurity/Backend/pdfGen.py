@@ -2,13 +2,25 @@ from fastapi import FastAPI, UploadFile, File, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fpdf import FPDF
-import shutil
 import os
 import uuid
+import hashlib
+from supabase import create_client, Client
+from datetime import datetime
+import psycopg2
+import asyncio
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 app = FastAPI()
 
-# Allow CORS from your frontend
+# Allow CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -20,132 +32,125 @@ app.add_middleware(
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
+def get_db_connection():
+    return psycopg2.connect(
+        dbname=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        host=os.getenv("DB_HOST"),
+        port=os.getenv("DB_PORT")
+    )
+
 @app.post("/pdfGen/")
 async def generate_pdf(
     title: str = Form(...),
     description: str = Form(...),
+    user_id: str = Form(...),
     attachments: list[UploadFile] = File(default=[])
 ):
     print(f"Received request - Title: {title}, Description: {description[:50]}...")
-    print(f"Number of attachments: {len(attachments)}")
-    
+    print(f"User ID: {user_id}")
+    print(f"Attachments: {len(attachments)}")
+
     try:
-        # Save attachments temporarily
         attachment_names = []
         for file in attachments:
             original_name = file.filename or "unnamed_file"
-            file_extension = os.path.splitext(original_name)[1] if '.' in original_name else '.bin'
-            unique_filename = f"{uuid.uuid4()}{file_extension}"
+            ext = os.path.splitext(original_name)[1] or ".bin"
+            unique_filename = f"{uuid.uuid4()}{ext}"
             file_path = os.path.join(UPLOAD_DIR, unique_filename)
-            
-            print(f"Saving attachment: {original_name} as {unique_filename}")
-            
+
             with open(file_path, "wb") as buffer:
                 content = await file.read()
                 buffer.write(content)
+
             attachment_names.append({
                 'original_name': original_name,
                 'saved_name': unique_filename
             })
 
-        # Generate PDF
+        # --- Generate PDF ---
         pdf = FPDF()
         pdf.add_page()
-        pdf.set_font("Arial", "B", 16)
+        pdf.add_font('DejaVu', '', 'fonts/DejaVuSans.ttf', uni=True)
+        pdf.set_font('DejaVu', '', 16)
         pdf.cell(0, 10, f"Incident Title: {title}", ln=True)
         pdf.ln(5)
-        pdf.set_font("Arial", "", 12)
-        
-        # Handle long descriptions by splitting into chunks
-        desc_chunks = [description[i:i+80] for i in range(0, len(description), 80)]
-        for chunk in desc_chunks:
-            pdf.multi_cell(0, 10, chunk)
-        
+        pdf.set_font('DejaVu', '', 12)
+        pdf.multi_cell(0, 8, description)
         pdf.ln(5)
 
         if attachment_names:
-            pdf.set_font("Arial", "B", 14)
+            pdf.set_font('DejaVu', '', 14)
             pdf.cell(0, 10, "Attachments:", ln=True)
             pdf.ln(5)
-
-            for attachment in attachment_names:
-                file_path = os.path.join(UPLOAD_DIR, attachment['saved_name'])
-                ext = attachment['original_name'].split('.')[-1].lower()
-
-                if ext in ['jpg', 'jpeg', 'png']:
+            for att in attachment_names:
+                path = os.path.join(UPLOAD_DIR, att["saved_name"])
+                ext = att["original_name"].split(".")[-1].lower()
+                if ext in ["jpg", "jpeg", "png"]:
                     try:
-                        # Check if adding the image would exceed page height
-                        # Assuming A4 page ~297mm height, margin ~10mm
-                        # current_y = pdf.get_y()
-                        # if current_y + 100 > 287:
-                        #     pdf.add_page()
-
-                        # Add image scaled to width=150
-                        pdf.image(file_path, w=150)
+                        pdf.image(path, w=100)
                         pdf.ln(5)
-                    except Exception as e:
-                        pdf.set_font("Arial", "", 12)
-                        pdf.cell(0, 10, f"Could not embed image {attachment['original_name']}", ln=True)
+                    except Exception:
+                        pdf.cell(0, 10, f"- {att['original_name']} (image failed)", ln=True)
                 else:
-                    pdf.set_font("Arial", "", 12)
-                    pdf.cell(0, 10, f"- {attachment['original_name']}", ln=True)
+                    pdf.cell(0, 10, f"- {att['original_name']}", ln=True)
 
-
-        # Generate unique PDF name
         pdf_filename = f"incident_{uuid.uuid4()}.pdf"
         pdf_path = os.path.join(UPLOAD_DIR, pdf_filename)
         pdf.output(pdf_path)
-        
-        print(f"PDF generated successfully: {pdf_filename}")
-        print(f"PDF file size: {os.path.getsize(pdf_path)} bytes")
-        
-        # Clean up attachment files
-        for attachment in attachment_names:
-            try:
-                os.remove(os.path.join(UPLOAD_DIR, attachment['saved_name']))
-                print(f"Cleaned up attachment: {attachment['saved_name']}")
-            except Exception as e:
-                print(f"Error cleaning up attachment: {e}")
 
-        return FileResponse(
-            pdf_path, 
+        # --- Hash PDF ---
+        with open(pdf_path, "rb") as f:
+            pdf_bytes = f.read()
+        pdf_hash = hashlib.sha256(pdf_bytes).hexdigest()
+
+        # --- Upload to Supabase ---
+        bucket_name = "reports-pdfs"
+        storage_path = f"{user_id}/{pdf_filename}"
+        supabase.storage.from_(bucket_name).upload(storage_path, file=pdf_bytes)
+        public_url = supabase.storage.from_(bucket_name).get_public_url(storage_path)
+
+        conn = get_db_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO reports (user_id, report_title, report_details, drive_id, pdf_hash, created_at)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            RETURNING id;
+        """, (user_id, title, description, storage_path, pdf_hash, datetime.utcnow()))
+        report_id = cur.fetchone()[0]
+        conn.commit()
+        cur.close()
+        conn.close()
+
+        response = FileResponse(
+            path=pdf_path,
             filename=pdf_filename,
             media_type='application/pdf'
         )
-        
+
+        # Schedule file cleanup after sending
+        async def cleanup_file():
+            await asyncio.sleep(2)  # wait for response to finish
+            os.remove(pdf_path)
+            for a in attachment_names:
+                os.remove(os.path.join(UPLOAD_DIR, a['saved_name']))
+
+        asyncio.create_task(cleanup_file())
+
+        return response
+
+
     except Exception as e:
         print(f"Error generating PDF: {str(e)}")
-        # Clean up on error
-        for attachment in attachment_names:
-            try:
-                os.remove(os.path.join(UPLOAD_DIR, attachment['saved_name']))
-            except:
-                pass
         raise HTTPException(status_code=500, detail=f"Error generating PDF: {str(e)}")
 
-# Health check endpoint
+
 @app.get("/")
 async def health_check():
     return {"status": "Server is running"}
 
-@app.get("/test-pdf")
-async def test_pdf():
-    """Test endpoint to verify PDF generation works"""
-    try:
-        pdf = FPDF()
-        pdf.add_page()
-        pdf.set_font("Arial", "B", 16)
-        pdf.cell(0, 10, "Test PDF", ln=True)
-        pdf.cell(0, 10, "This is a test PDF from the server", ln=True)
-        
-        pdf_filename = "test.pdf"
-        pdf_path = os.path.join(UPLOAD_DIR, pdf_filename)
-        pdf.output(pdf_path)
-        
-        return FileResponse(pdf_path, filename=pdf_filename)
-    except Exception as e:
-        return {"error": str(e)}
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=5000)

@@ -1,0 +1,84 @@
+INFO:     Started server process [18320]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8005 (Press CTRL+C to quit)
+INFO:     127.0.0.1:51844 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:51868 - "GET / HTTP/1.1" 404 Not Found
+[36m[apify.instagram-profile-scraper runId:oqC576L7NR68ih8Tm][0m -> Status: RUNNING, Message: 
+[36m[apify.instagram-profile-scraper runId:oqC576L7NR68ih8Tm][0m -> 2025-10-29T18:49:45.084Z ACTOR: Pulling container image of build yPYcXXZhffCZm8v9R from registry.
+[36m[apify.instagram-profile-scraper runId:oqC576L7NR68ih8Tm][0m -> 2025-10-29T18:49:45.086Z ACTOR: Creating container.
+[36m[apify.instagram-profile-scraper runId:oqC576L7NR68ih8Tm][0m -> 2025-10-29T18:49:45.124Z ACTOR: Starting container.
+[36m[apify.instagram-profile-scraper runId:oqC576L7NR68ih8Tm][0m -> 2025-10-29T18:49:45.976Z [32mINFO[39m  System info[90m {"apifyVersion":"3.5.1","apifyClientVersion":"2.19.0","crawleeVersion":"3.15.1","osType":"Linux","nodeVersion":"v22.20.0"}[39m
+[36m[apify.instagram-profile-scraper runId:oqC576L7NR68ih8Tm][0m -> 2025-10-29T18:49:46.098Z [32mINFO[39m  Results Limit [object Object], ACTOR_MAX_PAID_DATASET_ITEMS 1663
+[36m[apify.instagram-profile-scraper runId:oqC576L7NR68ih8Tm][0m -> 2025-10-29T18:49:46.098Z [32mINFO[39m  pushDataMaxAware 1663
+[36m[apify.instagram-profile-scraper runId:oqC576L7NR68ih8Tm][0m -> 2025-10-29T18:49:46.287Z [32mINFO[39m  [Status message]: Starting the scraper with 1 direct URL(s)
+[36m[apify.instagram-profile-scraper runId:oqC576L7NR68ih8Tm][0m -> Status: RUNNING, Message: Starting the crawler.
+[36m[apify.instagram-profile-scraper runId:oqC576L7NR68ih8Tm][0m -> 2025-10-29T18:49:46.536Z [32mINFO[39m [33m CheerioCrawler:[39m Starting the crawler.
+[36m[apify.instagram-profile-scraper runId:oqC576L7NR68ih8Tm][0m -> 2025-10-29T18:49:55.095Z [32mINFO[39m [33m CheerioCrawler:[39m All requests from the queue have been processed, the crawler will shut down.
+[36m[apify.instagram-profile-scraper runId:oqC576L7NR68ih8Tm][0m -> 2025-10-29T18:49:55.221Z [32mINFO[39m [33m CheerioCrawler:[39m Final request statistics:[90m {"requestsFinished":1,"requestsFailed":0,"retryHistogram":[1],"requestAvgFailedDurationMillis":null,"requestAvgFinishedDurationMillis":8428,"requestsFinishedPerMinute":7,"requestsFailedPerMinute":0,"requestTotalDurationMillis":8428,"requestsTotal":1,"crawlerRuntimeMillis":8873}[39m
+[36m[apify.instagram-profile-scraper runId:oqC576L7NR68ih8Tm][0m -> 2025-10-29T18:49:55.222Z [32mINFO[39m [33m CheerioCrawler:[39m Finished! Total 1 requests: 1 succeeded, 0 failed.[90m {"terminal":true}[39m
+[36m[apify.instagram-profile-scraper runId:oqC576L7NR68ih8Tm][0m -> 2025-10-29T18:49:55.246Z [32mINFO[39m  [Status message]: Scraper finished
+[36m[apify.instagram-profile-scraper runId:oqC576L7NR68ih8Tm][0m -> Status: SUCCEEDED, Message: Scraper finished
+Scraped Data: INFO:     10.0.0.100:57821 - "POST /api/model/predict_from_username HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "C:\Python312\Lib\site-packages\uvicorn\protocols\http\h11_impl.py", line 403, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\site-packages\uvicorn\middleware\proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\fastapi\applications.py", line 1082, in __call__
+    await super().__call__(scope, receive, send)
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\starlette\applications.py", line 113, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\starlette\middleware\errors.py", line 186, in __call__
+    raise exc
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\starlette\middleware\errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\starlette\middleware\exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\starlette\routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\starlette\routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\starlette\routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\starlette\routing.py", line 78, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\starlette\_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\starlette\_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\starlette\routing.py", line 75, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\fastapi\routing.py", line 308, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\fastapi\routing.py", line 221, in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\starlette\concurrency.py", line 38, in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\anyio\to_thread.py", line 56, in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\anyio\_backends\_asyncio.py", line 2461, in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\anyio\_backends\_asyncio.py", line 962, in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Itumeleng\Documents\A\Social-Security-\SocialSecurity\Backend\fastApi.py", line 47, in predict_from_username
+    print("Scraped Data:", profile_data)
+  File "C:\Python312\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f335' in position 192: character maps to <undefined>
+INFO:     Shutting down

@@ -1,14 +1,8 @@
 import { StyleSheet,View,Text, Image, ScrollView, SafeAreaView, FlatList, ActivityIndicator, TouchableOpacity } from "react-native";
 import React, { useEffect, useState } from "react";
-import { useNavigation } from "@react-navigation/native";
-import Components from "../Components/BreachNotification"
+import Components from "../Components/Components"
 import BottomNav from "../Components/BottomNav";
-import image1 from "../Images/200.gif"
-import image2 from "../Images/222.gif"
-import image3 from "../Images/123.gif"
-import image4 from "../Images/333.gif"
-import image5 from "../Images/444.gif"
-import image6 from "../Images/111.gif"
+
 
 export default function BreachAlerts(){
   const [data, setData] = useState([]);
@@ -54,7 +48,7 @@ export default function BreachAlerts(){
     <TouchableOpacity
       style={[
         style.sortButton,
-        sortKey === label && { backgroundColor: "#000" },
+        sortKey === label && { backgroundColor: "#8EC5FC" },
       ]}
       onPress={() => setSortKey(label)}
     >
@@ -87,14 +81,13 @@ export default function BreachAlerts(){
   data={sortedData}
   keyExtractor={(item, index) => index.toString()}
   renderItem={({ item }) => {
-    // get mapped domain, or fallback
     const domain = domainMap[item.Entity] || `${item.Entity.toLowerCase()}.com`;
 
     return (
       <View style={style.itemContainer}>
         <Image 
           source={{ uri: `https://logo.clearbit.com/${domain}` }} 
-          style={{ width: 60, height: 60, marginRight: 10 , borderRadius: 30 }} 
+          style={{ width: 60, height: 60, marginRight: 10 , borderRadius: 30, backgroundColor: '#FFF7E9'}} 
         />
         <View style={{paddingHorizontal: 10}}>
           <Text style={style.entity}>{item.Entity}</Text>
@@ -112,6 +105,7 @@ export default function BreachAlerts(){
     );
   }}
 />
+<BottomNav/>
 </SafeAreaView>
 );
 }
@@ -119,21 +113,23 @@ export default function BreachAlerts(){
 const style = StyleSheet.create({
    safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFF7E9',
   },
    container: {
      flex: 1,
-     backgroundColor: '#fff',
+     backgroundColor: '#FFF7E9',
    },
    scrollContent: {
     paddingBottom: 50, 
   },
   title: {
-    fontSize: 30, 
-    fontWeight: '600', 
-    marginTop: 20, 
-    marginBottom: 20,
-    paddingHorizontal: 20,
+    fontSize: 30,
+    fontWeight: '600',
+    marginTop: 20,
+    marginBottom: 10,
+    textAlign: 'center',
+    fontFamily: 'menlo',
+    paddingBottom: 29,
   },
   itemContainer:{
     flexDirection: "row", 
@@ -160,7 +156,7 @@ const style = StyleSheet.create({
     alignItems: 'center',
   },
   year:{
-    backgroundColor: '#240505ff',
+    backgroundColor: '#8EC5FC',
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 15,
@@ -169,7 +165,7 @@ const style = StyleSheet.create({
     marginHorizontal: 10,
   },
   bubbleText: {
-  backgroundColor: '#eee',
+  backgroundColor: '#fff',
   paddingHorizontal: 10,
   paddingVertical: 5,
   borderRadius: 15,
@@ -179,18 +175,18 @@ const style = StyleSheet.create({
 sortBar: {
     flexDirection: "row",
     justifyContent: "flex-start",
-    paddingHorizontal: 10,
+    paddingHorizontal: 50,
     marginBottom: 10,
   },
   sortButton: {
-    backgroundColor: "#eee",
+    backgroundColor: "#fff",
     paddingHorizontal: 19,
     paddingVertical: 6,
     borderRadius: 25,
     marginRight: 10,
-    height: 40,
+    height: 35,
     alignItems: 'center',
-    // width: 95,
+    padddingright: 10,
 
   },
   sortButtonText: { 

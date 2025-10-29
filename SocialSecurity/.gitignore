@@ -35,3 +35,16 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+*.db
+env/
+venv/
+.env
+instance/
+

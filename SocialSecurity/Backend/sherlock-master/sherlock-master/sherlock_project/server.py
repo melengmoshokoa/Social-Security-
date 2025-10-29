@@ -1,12 +1,14 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import subprocess, requests, json, re
+import psycopg2
+
 
 app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # in production: restrict to your app URL
+    allow_origins=["*"],   
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -18,6 +20,16 @@ sites = {
     "TikTok": "https://www.tiktok.com/@{}",
     "Twitter": "https://twitter.com/{}"
 }
+
+def get_db_connection():
+    return psycopg2.connect(
+        dbname="Social_Security",
+        user="postgres",
+        password="itumeleng",  
+        host="localhost",
+        port="5432"
+    )
+
 
 def check_username_on_sites(username):
     results = {}
@@ -62,9 +74,24 @@ def run_sherlock(username):
         return None
 
 @app.get("/scan/{username}")
-def scan_username(username: str):
+def scan_username(username: str, user_id: str):
     sherlock_results = run_sherlock(username)
     manual_results = check_username_on_sites(username)
+
+    action = f"Scanned username: {username}"
+    details = f"Sherlock found {len(sherlock_results or {})}, Manual found {len(manual_results or {})}"
+
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO logs (user_id, action, details)
+        VALUES (%s, %s, %s)
+        RETURNING *;
+    """, (user_id, action, details))
+    log = cur.fetchone()
+    conn.commit()
+    cur.close()
+    conn.close()
 
     print(sherlock_results)
     print(manual_results)
@@ -73,3 +100,8 @@ def scan_username(username: str):
         "Sherlock Results": sherlock_results,
         "Manual Checks": manual_results
     }
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("server:app", host="0.0.0.0", port=8002, reload=True)

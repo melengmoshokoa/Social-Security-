@@ -1,0 +1,64 @@
+Starting Social Security Backend Services...
+==================================================
+Port 8000 already in use. Skipping database.
+Port 8080 already in use. Skipping reverse-image.
+Port 5001 already in use. Skipping upload_zip.
+Port 8005 already in use. Skipping fastApi.
+Port 8002 already in use. Skipping sherlock.
+Starting main_server on port 8082...
+Traceback (most recent call last):
+  File "C:\Python312\Lib\site-packages\urllib3\util\connection.py", line 73, in create_connection
+    sock.connect(sa)
+ConnectionRefusedError: [WinError 10061] No connection could be made because the target machine actively refused it
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Itumeleng\Documents\A\Social-Security-\SocialSecurity\Backend\main.py", line 162, in <module>
+    manager.start_service(service_name, script_path)
+  File "C:\Users\Itumeleng\Documents\A\Social-Security-\SocialSecurity\Backend\main.py", line 57, in start_service
+    if self.check_single_service_health(service_name, port):
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Itumeleng\Documents\A\Social-Security-\SocialSecurity\Backend\main.py", line 72, in check_single_service_health
+    r = requests.get(f"http://127.0.0.1:{port}/", timeout=3)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\requests\api.py", line 73, in get
+    return request("get", url, params=params, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\requests\api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Itumeleng\AppData\Roaming\Python\Python312\site-packages\requests\adapters.py", line 667, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "C:\Python312\Lib\site-packages\urllib3\connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\site-packages\urllib3\connectionpool.py", line 493, in _make_request
+    conn.request(
+  File "C:\Python312\Lib\site-packages\urllib3\connection.py", line 445, in request
+    self.endheaders()
+  File "C:\Python312\Lib\http\client.py", line 1331, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "C:\Python312\Lib\http\client.py", line 1091, in _send_output
+    self.send(msg)
+  File "C:\Python312\Lib\http\client.py", line 1035, in send
+    self.connect()
+  File "C:\Python312\Lib\site-packages\urllib3\connection.py", line 276, in connect
+    self.sock = self._new_conn()
+                ^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\site-packages\urllib3\connection.py", line 198, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python312\Lib\site-packages\urllib3\util\connection.py", line 81, in create_connection
+    sock.close()
+  File "C:\Python312\Lib\socket.py", line 501, in close
+    def close(self):
+
+KeyboardInterrupt

@@ -55,11 +55,12 @@ export default function Passwords() {
   };
 
   const getColor = () => {
-      if (strength >= 90) return "#4CAF50"; // green
-      if (strength >= 70) return "#2196F3"; // blue
-      if (strength >= 50) return "#FFC107"; // amber
-      return "#F44336"; // red
-    };
+  if (strength >= 90) return "#00FF9C";   
+  if (strength >= 70) return "#FFD966";   
+  if (strength >= 50) return "#FF8C42";  
+  return "#FF4C4C";                       
+};
+
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -87,7 +88,7 @@ export default function Passwords() {
                     width={5}
                     fill={strength}  
                     tintColor={getColor()} 
-                    backgroundColor="#ffffffff"
+                    backgroundColor="#FFF7E9"
                   >
                     {() => (
                       <Text style={{ fontSize: 20, fontWeight: 'bold' }}>
@@ -109,8 +110,9 @@ export default function Passwords() {
 
         </ScrollView>
 
-        <BottomNav />
+        
       </View>
+      <BottomNav />
     </SafeAreaView>
   );
 }
@@ -118,18 +120,21 @@ export default function Passwords() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFF7E9',
   },
   container: {
     flex: 1,
     paddingHorizontal: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFF7E9',
   },
   title: {
     fontSize: 30,
     fontWeight: '600',
     marginTop: 20,
-    marginBottom: 35,
+    marginBottom: 10,
+    textAlign: 'center',
+    fontFamily: 'menlo',
+    paddingBottom: 29,
   },
   incident: {
     borderWidth: 1,
@@ -142,7 +147,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     borderWidth: 1,
     borderRadius: 30,
-    backgroundColor: '#000',
+    backgroundColor: '#8EC5FC',
     width: '95%',
     height: 50,
     justifyContent: 'center',
@@ -154,7 +159,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   resultContainer: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FFF7E9",
     borderRadius: 999,
     height: 270,
     width: 270,
@@ -176,6 +181,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     textAlign: "center",
     paddingHorizontal: 20,
+    fontFamily: 'SpaceMono-Regular', 
   },
   boldText: {
     fontWeight: "bold",

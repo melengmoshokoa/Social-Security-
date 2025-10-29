@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput, TouchableOpacity, Linking, ActivityIndicator } from 'react-native';
-import BottomNav from "../Components/BottomNav";
+import BottomNav from "../Components/BottomNav Invest";
 import Icon from "@expo/vector-icons/MaterialIcons";
+import { useNavigation, useRoute  } from "@react-navigation/native";
+import { getLocalIP } from './getLocalIP';
 
 
 export default function IdentityScanner() {
@@ -9,8 +11,11 @@ export default function IdentityScanner() {
   const [results, setResults] = useState({});
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState({ checked: 0, total: 0 });
-  
 
+  const route = useRoute();
+  const { userInfo } = route.params || {};
+  const userId = userInfo?.uid;
+  
   const handleSearch = async () => {
   if (!searchQuery.trim()) return;
 
@@ -23,13 +28,15 @@ export default function IdentityScanner() {
       Twitter: "https://twitter.com/"
     };
 
+  
+
   try {
-    const response = await fetch(`http://10.0.0.120:8000/scan/${searchQuery}`);
+    const response = await fetch(`http://${getLocalIP()}:8002/scan/${searchQuery}?user_id=${userInfo.uid}`);
     const data = await response.json();
     console.log('sherlock',data["Sherlock Results"]);
     console.log('manual',data["Manual Checks"]);
     
-const sherlockResults = data["Sherlock Results"] || {};
+    const sherlockResults = data["Sherlock Results"] || {};
     const manualResults = data["Manual Checks"] || {};
 
     const combined = { ...sherlockResults };
@@ -48,6 +55,7 @@ const sherlockResults = data["Sherlock Results"] || {};
   setLoading(false);
 }
 };
+
 
 
   return (
@@ -77,7 +85,7 @@ const sherlockResults = data["Sherlock Results"] || {};
 
           {loading && (
               <View style={styles.loadingContainer}>
-                <ActivityIndicator size="large" color="#C13584" /> 
+                <ActivityIndicator size="large" color="#8EC5FC" /> 
                 <Text style={styles.loadingText}>Scanning social media's...</Text>
               </View>
             )}
@@ -97,35 +105,43 @@ const sherlockResults = data["Sherlock Results"] || {};
           )}
         </ScrollView>
 
-        <BottomNav />
+        
       </View>
+      <BottomNav />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { 
-    flex: 1, 
-    backgroundColor: '#fff' },
-  container: { 
-    flex: 1, 
-    paddingHorizontal: 20, 
-    backgroundColor: '#fff' },
-  title: { 
-    fontSize: 30, 
-    fontWeight: '600', 
-    marginTop: 20, 
-    marginBottom: 20 },
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#FFF7E9',
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: 20,
+    backgroundColor: '#FFF7E9',
+  },
+  title: {
+    fontSize: 30,
+    fontWeight: '600',
+    marginTop: 20,
+    marginBottom: 10,
+    textAlign: 'center',
+    fontFamily: 'menlo',
+    paddingBottom: 39,
+  },
   scrollContent: { 
     paddingBottom: 50 },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f1f1f1',
+    backgroundColor: '#fff',
     borderRadius: 30,
     paddingHorizontal: 15,
     height: 50,
     marginBottom: 20,
+    borderWidth: 1,
   },
   searchIcon: { marginRight: 10 },
   clearIcon: { marginLeft: 10 },
@@ -137,19 +153,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffffff',
     marginBottom: 10,
     borderWidth: 1,
+    borderColor: "#8EC5FC"
   },
   platform: { 
   fontWeight: 'bold', 
   fontSize: 16, 
-  marginBottom: 3 
+  marginBottom: 3,
+  fontFamily: 'SpaceMono-Regular', 
 },
   url: { 
-    color: '#007AFF' 
+    color: '#8EC5FC' 
   },
   loadingContainer: {
   paddingTop: 15,
   borderRadius: 15,
-  backgroundColor: '#ffffffff',
+  backgroundColor: '#FFF7E9',
   marginBottom: 10,
   alignItems: 'center',
 },

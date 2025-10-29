@@ -3,10 +3,9 @@ import Components from "../Components/Components"
 import BottomNav from "../Components/BottomNav";
 
 const settings = [
-  { label: 'Account settings', color: '#2ECC71' },
-  { label: 'Privacy settings', color: '#58D68D' },
-  { label: 'Notification settings', color: '#82E0AA' },
-  { label: 'App preferences', color: '#A9DFBF' },
+  { label: 'Incident Center FAQ', color: '#2ebaccff' },
+  { label: 'Log Analysis FAQ', color: '#58c7d6ff' },
+  { label: 'User Awareness FAQ', color: '#82d5e0ff' },
 ];
 
 export default function Settings(){
@@ -21,10 +20,7 @@ export default function Settings(){
               <Text style={styles.username}>ITUMELENG</Text>
             </View>
           </View>
-          <View>
-            <Text style={styles.lastSeenLabel}>Last seen</Text>
-            <Text style={styles.lastSeen}>17 July, Mon</Text>
-          </View>
+         
         </View>
 
         <View style={styles.line}></View>
@@ -58,7 +54,7 @@ export default function Settings(){
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFF7E9',
   },
   container: {
     flex: 1,

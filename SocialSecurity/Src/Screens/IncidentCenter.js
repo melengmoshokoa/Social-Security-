@@ -3,11 +3,14 @@ import {
   View, Text, StyleSheet, ScrollView, SafeAreaView, TextInput, 
   TouchableOpacity, Alert, ActivityIndicator, Platform 
 } from 'react-native';
+import { useNavigation, useRoute } from "@react-navigation/native";
 import BottomNav from "../Components/BottomNav";
 import * as DocumentPicker from 'expo-document-picker';
 import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import * as MediaLibrary from 'expo-media-library';
+import axios from 'axios';
+import { getLocalIP } from './getLocalIP';
 
 export default function IncidentCenter() {
   const [incidentTitle, setIncidentTitle] = useState('');
@@ -15,6 +18,11 @@ export default function IncidentCenter() {
   const [attachments, setAttachments] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [generatedPdfUrl, setGeneratedPdfUrl] = useState(null);
+
+  const route = useRoute();
+  const { userInfo } = route.params;
+
+  const API_URL = `http://${getLocalIP()}:8000`;
 
   const pickFile = async () => {
     try {
@@ -35,6 +43,7 @@ export default function IncidentCenter() {
     }
   };
 
+
   const removeFile = (index) => {
     setAttachments(attachments.filter((_, i) => i !== index));
   };
@@ -52,8 +61,7 @@ export default function IncidentCenter() {
       const formData = new FormData();
       formData.append("title", incidentTitle);
       formData.append("description", description);
-
-      // Add attachments if any
+      formData.append("user_id", userInfo.uid);
       attachments.forEach((file, index) => {
         formData.append("attachments", {
           uri: file.uri,
@@ -62,11 +70,14 @@ export default function IncidentCenter() {
         });
       });
 
+      console.log(userInfo)
+
       console.log('Sending request to server...');
       
-      const response = await fetch("http://10.0.0.120:8081/pdfGen/", {
+      const response = await fetch(`http://${getLocalIP()}:5000/pdfGen/`, {
         method: "POST",
         body: formData,
+        
       });
 
       console.log('Response status:', response.status, response.ok);
@@ -77,32 +88,25 @@ export default function IncidentCenter() {
         throw new Error(`Server error: ${response.status}`);
       }
 
-      // Get the PDF as blob
       const blob = await response.blob();
       console.log('PDF blob received, size:', blob.size, 'bytes');
       
       if (blob.size === 0) {
         throw new Error('Received empty PDF from server');
       }
-
-      // Convert blob to base64 using a different approach
       const base64Data = await blobToBase64(blob);
-      
-      // Generate filename
       const timestamp = new Date().getTime();
       const filename = `incident_report_${timestamp}.pdf`;
       const fileUri = FileSystem.documentDirectory + filename;
 
       console.log('Saving PDF to:', fileUri);
       
-      // Save file - FIXED: Using the correct encoding constant
       await FileSystem.writeAsStringAsync(fileUri, base64Data, {
         encoding: 'base64',
       });
 
       console.log('PDF saved successfully');
       
-      // Verify file exists
       const fileInfo = await FileSystem.getInfoAsync(fileUri);
       if (fileInfo.exists) {
         console.log('File verified, size:', fileInfo.size, 'bytes');
@@ -117,7 +121,6 @@ export default function IncidentCenter() {
           ]
         );
         
-        // Clear form
         setIncidentTitle('');
         setDescription('');
         setAttachments([]);
@@ -133,12 +136,10 @@ export default function IncidentCenter() {
     }
   };
 
-  // Simple blob to base64 conversion
   const blobToBase64 = (blob) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onloadend = () => {
-        // Remove the data:application/pdf;base64, prefix
         const base64 = reader.result.split(',')[1];
         resolve(base64);
       };
@@ -152,7 +153,6 @@ export default function IncidentCenter() {
       console.log('Starting download process for:', fileUri);
       
       if (Platform.OS === 'ios') {
-        // For iOS, use Sharing API
         if (await Sharing.isAvailableAsync()) {
           await Sharing.shareAsync(fileUri, {
             mimeType: 'application/pdf',
@@ -163,7 +163,6 @@ export default function IncidentCenter() {
           Alert.alert('Success', 'PDF saved to app storage. You can access it via the Files app.');
         }
       } else {
-        // For Android, save to media library
         const { status } = await MediaLibrary.requestPermissionsAsync();
         if (status === 'granted') {
           const asset = await MediaLibrary.createAssetAsync(fileUri);
@@ -179,35 +178,12 @@ export default function IncidentCenter() {
     }
   };
 
-  const testServerConnection = async () => {
-    try {
-      console.log('Testing server connection...');
-      const response = await fetch('http://10.0.0.120:8081/health');
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Server health check:', result);
-        Alert.alert('Server Test', `Connection successful: ${result.status}`);
-      } else {
-        throw new Error(`HTTP ${response.status}`);
-      }
-    } catch (error) {
-      console.error('Server test failed:', error);
-      Alert.alert('Server Test', `Connection failed: ${error.message}`);
-    }
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <Text style={styles.title}>Incident Report</Text>
 
-        {/* Test Server Connection Button
-        <TouchableOpacity style={styles.testButton} onPress={testServerConnection}>
-          <Text style={styles.testButtonText}>Test Server Connection</Text>
-        </TouchableOpacity> */}
-
         <ScrollView contentContainerStyle={styles.scrollContent}>
-          {/* Generated PDF Section */}
           {generatedPdfUrl && (
             <View style={styles.pdfSection}>
               <Text style={styles.pdfTitle}>✓ PDF Generated Successfully!</Text>
@@ -282,8 +258,9 @@ export default function IncidentCenter() {
           </TouchableOpacity>
         </ScrollView>
         
-        <BottomNav />
+        
       </View>
+      <BottomNav />
     </SafeAreaView>
   );
 }
@@ -291,12 +268,12 @@ export default function IncidentCenter() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFF7E9',
   },
   container: {
     flex: 1,
     paddingHorizontal: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFF7E9',
   },
   title: {
     fontSize: 30,
@@ -304,25 +281,16 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 10,
     textAlign: 'center',
-  },
-  testButton: {
-    backgroundColor: '#666',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 20,
-    alignSelf: 'center',
-  },
-  testButtonText: {
-    color: '#fff',
-    fontSize: 12,
+    fontFamily: 'menlo',
+    paddingBottom: 39,
   },
   scrollContent: {
-    paddingBottom: 20,
+    paddingBottom: 70,
   },
   pdfSection: {
     backgroundColor: '#e8f5e8',
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 30,
     marginBottom: 20,
     borderWidth: 1,
     borderColor: '#4caf50',
@@ -337,7 +305,7 @@ const styles = StyleSheet.create({
   downloadButton: {
     backgroundColor: '#4caf50',
     padding: 12,
-    borderRadius: 5,
+    borderRadius: 30,
   },
   downloadButtonText: {
     color: '#fff',
@@ -351,7 +319,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: 15,
     marginBottom: 15,
-    borderColor: '#ddd',
+    borderColor: '#000',
   },
   description: {
     borderWidth: 1,
@@ -362,16 +330,16 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     textAlignVertical: 'top',
     marginBottom: 15,
-    borderColor: '#ddd',
+    borderColor: '#000',
   },
   uploadSection: {
     marginBottom: 15,
     width: '100%',
   },
   uploadButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: '#8EC5FC',
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 30,
     width: '100%',
   },
   uploadButtonText: {
@@ -396,9 +364,9 @@ const styles = StyleSheet.create({
     padding: 10,
     borderWidth: 1,
     borderColor: '#ddd',
-    borderRadius: 5,
+    borderRadius: 30,
     marginBottom: 5,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: '#ffffffff',
   },
   fileName: {
     fontSize: 14,
@@ -413,7 +381,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     backgroundColor: '#000',
     padding: 15,
-    borderRadius: 10,
+    borderRadius: 30,
     width: '100%',
   },
   submitButtonText: {

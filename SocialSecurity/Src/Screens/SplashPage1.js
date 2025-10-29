@@ -1,11 +1,16 @@
 import { StyleSheet,View,Text } from "react-native";
 import Square from "../Components/SplashSquare"
+import image from '../../assets/vN9u3Zu6.jpg'
+import Typewriter from "../Components/Typewriter";
 
 export default function SplashPage1(){
     return(
         <View style={style.container}>
+
+        <Text style={style.Logo}>SocialSecurity</Text>
+
         <Square
-            // imageUrl={ imageUrl}
+            image={image}
         />
             <Text style={style.contraction}>
                 I'm
@@ -20,20 +25,27 @@ export default function SplashPage1(){
 const style = StyleSheet.create({
    container: {
      flex: 1,
-     backgroundColor: '#fff',
+     backgroundColor: '#FFF7E9',
    },
    contraction: {
     color: '#000000',
     fontSize: 80,
     marginLeft: 10,
+    fontFamily: 'menlo',
 
    },
    name: {
     fontSize: 210,
-    justifyContent: 'center',
-    alignItems: 'center',
+    textAlign: 'center',
     marginLeft: 5,
-   }
+    fontFamily: 'menlo',
+   },
+   Logo:{
+    textAlign: 'center',
+    paddingTop: 70,
+    fontSize: 18,
+    fontWeight: 'bold',
+ },
  
  
  });

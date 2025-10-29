@@ -3,15 +3,16 @@
  import { BlurView } from "expo-blur";
  import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from "@react-navigation/native";
+
  
 
 
- export default function Components({imageUrl, pageName, navName}) {
+ export default function Components({imageUrl, pageName, navName, userInfo}) {
 
   const navigation = useNavigation();
     
       const Nav= () => {
-          navigation.navigate(navName);
+          navigation.navigate(navName,{userInfo});
         };
     
 
@@ -19,7 +20,7 @@ import { useNavigation } from "@react-navigation/native";
      <View style={styles.container}>
        <View style={styles.square}>
         <TouchableOpacity onPress={Nav}>
-         <Image source={imageUrl} style={styles.image} resizeMode="cover" /> 
+         <Image source={imageUrl} style={styles.image} resizeMode="cover"/> 
          </TouchableOpacity>                                                                                                                                                                                                             
        </View>
        {/* <BlurView intensity={5} tint="light" style={styles.glass}>
@@ -36,11 +37,11 @@ import { useNavigation } from "@react-navigation/native";
  
  const styles = StyleSheet.create({
    container: {
-     backgroundColor: '#fff',
+     backgroundColor: '#FFF7E9',
      paddingHorizontal: 10,
      marginTop: 10,
      height: '90%',
-     width: '50%',
+     width: '100%',
    },
    square: {
      backgroundColor: "#000000",
@@ -51,6 +52,7 @@ import { useNavigation } from "@react-navigation/native";
      shadowOffset: {width: 0, height: 4},
      shadowOpacity: 0.25,
      shadowRadius: 4,
+     backgroundColor: "rgba(0, 0, 0, 0.3)",
    },
    image: {
     width: '100%',
@@ -78,7 +80,7 @@ import { useNavigation } from "@react-navigation/native";
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 4,
     paddingHorizontal: 0,
-    paddingVertical: 25,
+    paddingVertical: 5,
     position: "absolute",
     bottom: 0,
     left: 6,

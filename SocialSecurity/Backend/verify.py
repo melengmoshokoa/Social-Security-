@@ -19,4 +19,4 @@ def verify():
         return jsonify({"status": "error", "message": str(e)}), 401
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000,debug=True)
+    app.run(host="0.0.0.0", port=8081,debug=True)
