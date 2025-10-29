@@ -1,14 +1,15 @@
 import psycopg2
+from dotenv import load_dotenv
+import os
 
-conn = psycopg2.connect(
-    dbname="Social_Security",
-    user="postgres",
-    password="itumeleng",  # replace with your actual password
-    host="localhost",
-    port="5432"
-)
+load_dotenv()
 
-cur = conn.cursor()
-cur.execute("SELECT 1;")
-print(cur.fetchone())
-conn.close()
+def get_db_connection():
+    conn = psycopg2.connect(
+        dbname=os.getenv("DB_NAME"),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        host=os.getenv("DB_HOST"),
+        port=os.getenv("DB_PORT")
+    )
+    return conn

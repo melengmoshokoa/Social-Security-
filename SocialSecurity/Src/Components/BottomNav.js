@@ -1,25 +1,17 @@
  import { StatusBar } from 'expo-status-bar';
  import { StyleSheet, Text, View,TouchableOpacity } from 'react-native';
  import Icon from "@expo/vector-icons/MaterialIcons";
- import { useNavigation } from "@react-navigation/native";
+ import { useNavigation, useRoute } from "@react-navigation/native";
 
 
-
- export default function BottomNav({imageUrl}) {
+ export default function BottomNav() {
 
   const navigation = useNavigation();
-
-  const NavMain = () => {
-      navigation.navigate("Main");
-    };
-
-    const NavCalendar = () => {
-      navigation.navigate("Calendar");
-    };
-
-    const NavSettings = () => {
-      navigation.navigate("Settings");
-    };
+  const route = useRoute();
+  const { userInfo } = route.params;
+  const NavMain = () => navigation.navigate("Main", { userInfo });
+  const NavCalendar = () => navigation.navigate("Calendar", { userInfo });
+  const NavSettings = () => navigation.navigate("Settings", { userInfo });
 
 
    return (
@@ -43,39 +35,33 @@
  
  const styles = StyleSheet.create({
    container: {
-     backgroundColor: '#fff',
-     paddingHorizontal: 10,
-     height: '7%',
-     width: '100%',
-     paddingBottom: 10,
-     flexDirection: 'row',
-     alignItems: 'center',
-     justifyContent: 'center',
-     marginLeft: 5,
-     marginTop: 10,
-   },
+  backgroundColor: '#FFF7E9',
+  height: '10%',           
+  width: '100%',
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  position: 'absolute',   
+  bottom: 2,              
+  left: 0,
+  right: 0,
+  paddingVertical: 10,
+  elevation: 5,
+},
    square: {
-     backgroundColor: "#000000",
-     width: '25%',
-     height: '100%',
-     borderRadius: 30,
-     paddingHorizontal: 30,
-     alignItems: 'center',
-     marginLeft: 5,
-     marginTop: 30,
-     shadowColor: 'black',
-     shadowOffset: {width: 0, height: 4},
-     shadowOpacity: 0.25,
-     shadowRadius: 4,
-     paddingTop: 10
-
-
-   },
-   contraction: {
- 
-   },
-   name: {}
- 
+  backgroundColor: "#8EC5FC",
+  width: '25%',
+  height: '80%',
+  borderRadius: 30,
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginHorizontal: 5,
+  shadowColor: 'black',
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.25,
+  shadowRadius: 4,
+  paddingVertical: 10,
+},
  
  });
  

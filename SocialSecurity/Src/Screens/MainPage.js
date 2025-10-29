@@ -1,15 +1,25 @@
 import { StyleSheet,View,Text, Image } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Components from "../Components/Components"
 import BottomNav from "../Components/BottomNav";
-import image1 from "../Images/200.gif"
-import image2 from "../Images/222.gif"
-import image3 from "../Images/123.gif"
-import image4 from "../Images/333.gif"
-import image5 from "../Images/444.gif"
-import image6 from "../Images/111.gif"
+import image1 from "../../../SocialSecurity/assets/iEc2lRM7.jpg"
+import image2 from "../../../SocialSecurity/assets/oKi8wAGL.jpg"
+import image4 from "../../../SocialSecurity/assets/End00Rjn.jpg"
+import image6 from "../../../SocialSecurity/assets/Etn-Fg-W.jpg"
 
 export default function MainPage(){
+
+    const route = useRoute();
+    const { userInfo } = route.params;
+
+
+    const getGreeting = () => {
+    const hour = new Date().getHours();
+
+    if (hour < 12) return "Good Morning";
+    if (hour < 18) return "Good Afternoon";
+    return "Good Evening";
+  };
 
     return (
     <View style={style.container}>
@@ -17,7 +27,7 @@ export default function MainPage(){
 
         <View style={style.userinfo2}>
         <View style={style.userinfo}>
-        <Text style={style.greeting}>GOOD MORNING ITUMELENG</Text>
+        <Text style={style.greeting}>{getGreeting().toUpperCase()} {userInfo.username}</Text>
         <Text style={style.message}>hope you're havinga a good day</Text>
         
         </View>
@@ -35,29 +45,19 @@ export default function MainPage(){
                     imageUrl={image1}
                     pageName="Incident Center"
                     navName="IncidentCenter"
+                    userInfo={userInfo}
                     
         />
 
-        <Components
-                    imageUrl={image2}
-                    pageName="Log Analysis"
-                    navName="Logs"
-        />
-
         </View>
 
         <View style={style.box}>
-
-        <Components
-                    imageUrl={image3}
-                    pageName="Identity Scanner"
-                    navName="IdentityScanner"
-        />
 
         <Components
                     imageUrl={image4}
-                    pageName="Breach Alerts"
-                    navName="Breachs"
+                    pageName="Log Analysis"
+                    navName="Logs"
+                    userInfo={userInfo}
         />
 
         </View>
@@ -65,20 +65,29 @@ export default function MainPage(){
         <View style={style.box}>
 
         <Components
-                    imageUrl={image5}
-                    pageName="Image Guard"
-                    navName="Images"
+                    imageUrl={image2}
+                    pageName="Breach Alerts"
+                    navName="Breachs"
+                    userInfo={userInfo}
         />
+
+        
+
+        </View>
+
+
+        <View style={style.box}>
 
         <Components
                     imageUrl={image6}
                     pageName="Password Saftey"
                     navName="Passwords"
+                    userInfo={userInfo}
         />
 
         </View>
 
-        <BottomNav/>
+        <BottomNav userInfo={userInfo}/>
         
     </View>
 );
@@ -87,7 +96,7 @@ export default function MainPage(){
 const style = StyleSheet.create({
    container: {
      flex: 1,
-     backgroundColor: '#fff',
+     backgroundColor: '#FFF7E9',
    },
    userinfo:{
     width: '65%',
@@ -113,16 +122,18 @@ const style = StyleSheet.create({
     paddingTop: 5,
     paddingHorizontal: 17,
     paddingBottom: 20,
+    fontFamily: 'SpaceMono-Regular', 
    },
    greeting: {
     paddingTop: 65,
     paddingHorizontal: 15,
     fontWeight: 'bold',
     fontSize: 20,
+    fontFamily: 'menlo',
    },
    box: {
-    flexDirection: 'row',
-    height: '23%',
+     paddingTop: 8,
+    height: '16%',
    },
  
  

@@ -1,6 +1,8 @@
-import React from 'react';
+import React , { useEffect, useState }  from 'react';
 import { View, Text, StyleSheet, ScrollView, SafeAreaView } from 'react-native';
 import BottomNav from "../Components/BottomNav";
+import axios from 'axios';
+import { getLocalIP } from './getLocalIP';
 
 const activities = [
   { day: 'MON', action: 'Checked username', time: '17:00 pm' },
@@ -13,7 +15,45 @@ const activities = [
   { day: 'FRI', action: 'Checked username', time: '17:00 pm' },
 ];
 
-export default function TimelineScreen() {
+export default function TimelineScreen({route}) {
+
+  const { userInfo } = route.params;
+
+  const [activities, setActivities] = useState([]);
+  const API_URL = `http://${getLocalIP()}:8000`;
+
+
+  useEffect(() => {
+    const fetchLogs = async () => {
+      try {
+        console.log(userInfo)
+        const response = await axios.get(`${API_URL}/logs/${userInfo.uid}`);
+        const logs = response.data;
+
+        console.log(logs)
+
+        const timelineData = logs.map(log => {
+          const date = new Date(log.created_at);
+          const dayNames = ['SUN', 'MON', 'TUES', 'WED', 'THURS', 'FRI', 'SAT'];
+          const day = dayNames[date.getDay()];
+          const time = date.getHours() + ":" + (date.getMinutes()<10?'0':'') + date.getMinutes() + (date.getHours()>=12?' pm':' am');
+
+          return {
+            day,
+            action: log.action + (log.details ? `: ${log.details}` : ''),
+            time
+          };
+        });
+
+        setActivities(timelineData.reverse()); 
+      } catch (error) {
+        console.error("Failed to fetch logs:", error.message);
+      }
+    };
+
+    fetchLogs();
+  }, [userInfo]);
+  
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -42,10 +82,10 @@ export default function TimelineScreen() {
 
 
         </ScrollView>
-       <BottomNav />
+       
       </View>
 
-       
+       <BottomNav />
     </SafeAreaView>
     
   );
@@ -54,18 +94,22 @@ export default function TimelineScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFF7E9',
   },
   container: {
     flex: 1,
     paddingHorizontal: 20,
-    backgroundColor: '#fff',
+    backgroundColor: '#FFF7E9',
+    fontFamily: 'SpaceMono-Regular', 
   },
   title: {
-    fontSize: 18,
+    fontSize: 30,
     fontWeight: '600',
     marginTop: 20,
-    marginBottom: 35,
+    marginBottom: 10,
+    textAlign: 'center',
+    fontFamily: 'menlo',
+    paddingBottom: 29,
   },
   scrollContent: {
     paddingBottom: 50, 
@@ -90,18 +134,18 @@ const styles = StyleSheet.create({
   verticalLine: {
     width: 2,
     height: 20,
-    backgroundColor: '#888',
+    backgroundColor: '#000',
   },
   dot: {
     width: 10,
     height: 10,
     borderRadius: 5,
-    backgroundColor: '#888',
+    backgroundColor: '#8EC5FC',
     marginVertical: 2,
   },
   card: {
     flex: 1,
-    backgroundColor: '#ddd',
+    backgroundColor: '#fff',
     padding: 12,
     borderRadius: 12,
   },
@@ -113,5 +157,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#444',
     marginTop: 4,
+    fontFamily: 'SpaceMono-Regular', 
   },
 });
